@@ -1,0 +1,23 @@
+# OS X folder attributes
+.DS_Store
+.idea
+debug.log
+
+# Editors settings
+*.sublime-workspace
+*.sublime-project
+/.vscode
+
+# Dependency directory
+# Commenting this out is preferred by some people, see
+# https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
+node_modules
+
+# Bower directory
+bower_components
+
+# Bower styles
+theme-src/styles/vendor/bower
+
+# Public
+web/content/themes/mitsubishi-theme
