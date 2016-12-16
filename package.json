@@ -14,14 +14,19 @@
     "browsersync": "browser-sync start -s \"build\" -f \"build\"",
     "sass": "node-sass src/styles --include-path ./node_modules/bourbon/app/assets/stylesheets --source-map build/styles/maps -o build/styles",
     "sass:prod": "node-sass src/styles --include-path ./node_modules/bourbon/app/assets/stylesheets --output-style compressed -o build/styles",
-    "sass:watch": "onchange \"src/styles/*{sass,scss}\" -- npm run build-css",
-    "build": "run-p build-css",
-    "watch": "run-p browsersync watch-css",
-    "serve": "run-s build-all watch-all"
+    "sass:watch": "onchange \"src/styles/*.{sass,scss}\" -- npm run sass",
+    "webpack": "webpack",
+    "webpack:prod": "cross-env NODE_ENV=production webpack",
+    "webpack:watch": "onchange \"src/scripts/*.ts\" -- npm run webpack",
+    "build": "run-p sass webpack",
+    "build:prod": " run-p sass:prod webpack:prod",
+    "watch": "run-p browsersync sass:watch webpack:watch",
+    "serve": "run-s build watch"
   },
   "devDependencies": {
     "bourbon": "^4.2.7",
     "browser-sync": "^2.18.5",
+    "cross-env": "^3.1.3",
     "node-sass": "^4.0.0",
     "npm-run-all": "^3.1.2",
     "onchange": "^3.2.0",
