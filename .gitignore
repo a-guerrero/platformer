@@ -6,18 +6,12 @@ debug.log
 # Editors settings
 *.sublime-workspace
 *.sublime-project
-/.vscode
+.vscode
 
 # Dependency directory
 # Commenting this out is preferred by some people, see
 # https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
 node_modules
 
-# Bower directory
-bower_components
-
-# Bower styles
-theme-src/styles/vendor/bower
-
-# Public
-./build
+# Dest folder (or src, public, bin, build)
+build
