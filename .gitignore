@@ -20,4 +20,4 @@ bower_components
 theme-src/styles/vendor/bower
 
 # Public
-web/content/themes/mitsubishi-theme
+./build
