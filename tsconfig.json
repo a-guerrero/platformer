@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "forceConsistentCasingInFileNames": true,
+        "module": "amd",
+        "target": "ES5"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
