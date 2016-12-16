@@ -12,15 +12,18 @@
   },
   "scripts": {
     "browsersync": "browser-sync start -s \"build\" -f \"build\"",
+    "pug": "pug src/*.pug -P -o build",
+    "pug:prod": "pug src/*.pug -o build",
+    "pug:watch": "onchange \"src/*.pug\" -- npm run pug",
     "sass": "node-sass src/styles --include-path ./node_modules/bourbon/app/assets/stylesheets --source-map build/styles/maps -o build/styles",
     "sass:prod": "node-sass src/styles --include-path ./node_modules/bourbon/app/assets/stylesheets --output-style compressed -o build/styles",
     "sass:watch": "onchange \"src/styles/*.{sass,scss}\" -- npm run sass",
     "webpack": "webpack",
     "webpack:prod": "cross-env NODE_ENV=production webpack",
     "webpack:watch": "onchange \"src/scripts/*.ts\" -- npm run webpack",
-    "build": "run-p sass webpack",
-    "build:prod": " run-p sass:prod webpack:prod",
-    "watch": "run-p browsersync sass:watch webpack:watch",
+    "build": "run-p pug sass webpack",
+    "build:prod": " run-p pug:prod sass:prod webpack:prod",
+    "watch": "run-p browsersync pug:watch sass:watch webpack:watch",
     "serve": "run-s build watch"
   },
   "devDependencies": {
@@ -30,6 +33,8 @@
     "node-sass": "^4.0.0",
     "npm-run-all": "^3.1.2",
     "onchange": "^3.2.0",
+    "pug": "^2.0.0-beta6",
+    "pug-cli": "^1.0.0-alpha6",
     "ts-loader": "^1.3.3",
     "typescript": "^2.1.4",
     "webpack": "^1.14.0"
