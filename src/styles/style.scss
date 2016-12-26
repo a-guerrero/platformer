@@ -1,0 +1,28 @@
+@import 'bourbon';
+
+html,
+body {
+    font-size: $em-base;
+    background: #4c4158;
+
+    @include size(100%);
+}
+
+html,
+body,
+section,
+canvas {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.h-no-display {
+    display: none;
+}
+
+#js-stage {
+    margin: 2em auto;
+    @include size(512px 288px);
+    background: rgba(black, 0.15);
+}
