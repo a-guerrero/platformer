@@ -14,4 +14,4 @@ debug.log
 node_modules
 
 # Dest folder (or src, public, bin, build)
-build
+dist

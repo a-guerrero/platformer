@@ -1,9 +1,9 @@
 const isProduction = process.env.NODE_ENV === 'production';
 
 const config = {
-    entry: './src/scripts/app.ts',
+    entry: './app/scripts/app.ts',
     output: {
-        path: __dirname + '/build/scripts',
+        path: __dirname + '/dist/scripts',
         filename: 'app.js'
     },
     resolve: {
