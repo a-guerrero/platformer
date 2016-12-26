@@ -1,15 +1,16 @@
 doctype html
 html(lang="en")
-head
-    block layout-head
-        meta(charset="UTF-8")
-        title Platformer
+    head
+        block layout-head
+            meta(charset="UTF-8")
+            title Platformer
 
-    block layout-styles
-        link(rel="stylesheet", href="/styles/style.css")
-body
-    main.l-main
-        block layout-main
+        block layout-styles
+            link(rel="stylesheet", href="/styles/style.css")
 
-    block layout-scripts
-        script(type="text/javascript" src="/scripts/app.js")
+    body
+        main.l-main
+            block layout-main
+
+        block layout-scripts
+            script(type="text/javascript" src="/scripts/app.js")
