@@ -38,7 +38,7 @@
     "watch:sass": "onchange \"app/styles/*.{sass,scss}\" -- npm run build:sass",
     "build:webpack": "webpack",
     "build-prod:webpack": "cross-env NODE_ENV=production webpack",
-    "watch:webpack": "onchange \"app/scripts/*.ts\" -- npm run build:webpack",
+    "watch:webpack": "onchange \"app/scripts/**/*.ts\" -- npm run build:webpack",
     "build": "npm-run-all clean:dist -p copy:* build:*",
     "build-prod": "npm-run-all clean:dist -p copy:* build-prod:*",
     "watch": "npm-run-all -p watch:*",
