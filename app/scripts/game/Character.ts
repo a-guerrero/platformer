@@ -40,7 +40,7 @@ export class Character extends Rect {
         this.xVel = 0;
 
         // Ends vertical moving completly
-        this.stopJump();
+        this.isJumping = false;
         this.yVel = 0;
 
         this.isDeath = true;
@@ -69,20 +69,11 @@ export class Character extends Rect {
 
     jump(): this {
 
-        // Abort if already jumping (user pressing jump key) or if actually
-        // jumping (yVel not being 0 means character is moving vertically)
-        if (!this.isJumping && this.yVel === 0) {
+        // Abort if already jumping
+        if (!this.isJumping) {
             this.isJumping = true;
             this.yVel -= this.ySpeed;
         }
-
-        return this;
-    }
-
-    stopJump(): this {
-
-        // Unblocks jumping
-        this.isJumping = false;
 
         return this;
     }
@@ -154,6 +145,10 @@ export class Character extends Rect {
             // Stop vertical movement if character is moving down
             if (side === 'bottom' && this.yVel > 0) {
                 this.yVel = 0;
+
+                if (this.isJumping) {
+                    this.isJumping = false;
+                }
             }
         }
 
