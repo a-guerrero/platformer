@@ -1,4 +1,4 @@
-import { Rect } from '../utils/canvas/Rect';
+import { Rect } from '../../utils/canvas/Rect';
 
 export interface Collision {
     side: 'top' | 'right' | 'bottom' | 'left';
