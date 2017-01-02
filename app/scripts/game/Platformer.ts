@@ -1,5 +1,7 @@
+import { checkForCollision } from './checkForCollision';
 import { Stage } from './Stage';
 import { Character } from './Character';
+import { Obstacle } from './Obstacle';
 
 interface Canvas {
     elem: HTMLCanvasElement;
@@ -12,6 +14,7 @@ export class Platformer {
 
     private stage: Stage;
     private protagonist: Character;
+    private obstacleArr: Obstacle[];
 
     constructor(public canvas: Canvas) {
 
@@ -28,9 +31,44 @@ export class Platformer {
         this.protagonist.y = canvas.height - this.protagonist.height;
         this.protagonist.fillStyle = 'indianred';
 
-        this.bind();
-        this.update();
-        // setInterval(() => { this.update(); }, 150);
+        this
+            .bind()
+            .setObstacleArr()
+            //.update();
+
+        setInterval(() => { this.update(); }, 250 );
+    }
+
+    private setObstacleArr(): this {
+
+        let { stage, canvas } = this;
+        let obstaclesData = [
+            // Ground
+            { x: 0, y: stage.height - 10, width: stage.width, height: 20 },
+            // Left wall
+            { x: -10, y: 0, width: 20, height: stage.height },
+            // Right wall
+            { x: stage.width - 10, y: 0, width: 20, height: stage.height },
+            // Bards
+            { x: 40,  y: stage.height - 70, width: 40, height: 60 },
+            { x: 120, y: stage.height - 70, width: 40, height: 60 },
+            { x: 200, y: stage.height - 70, width: 40, height: 60 },
+            { x: 280, y: stage.height - 70, width: 40, height: 60 }
+        ];
+
+        this.obstacleArr = [];
+        obstaclesData.forEach(obj => {
+
+            let obstacle = new Obstacle(canvas.ctx);
+            obstacle.x = obj.x;
+            obstacle.y = obj.y;
+            obstacle.width = obj.width;
+            obstacle.height = obj.height;
+
+            this.obstacleArr.push(obstacle);
+        });
+
+        return this;
     }
 
     private bind(): this {
@@ -82,14 +120,25 @@ export class Platformer {
 
     private update(): this {
 
-        let { canvas, stage, protagonist } = this;
+        let { canvas, stage, protagonist, obstacleArr } = this;
 
         canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         protagonist.update();
-        protagonist.render();
 
-        requestAnimationFrame(this.update.bind(this));
+        obstacleArr.forEach(obstacle => {
+
+            let collision = checkForCollision(protagonist, obstacle, true);
+
+            if (typeof collision === 'object') {
+                protagonist.collisionHandler(collision.side, collision.depth);
+            }
+
+            obstacle.render();
+        });
+
+        protagonist.render();
+        // requestAnimationFrame(this.update.bind(this));
 
         return this;
     }
