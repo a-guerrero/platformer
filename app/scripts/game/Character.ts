@@ -19,7 +19,6 @@ export class Character extends Rect {
 
         this.width = 20;
         this.height = 30;
-
         this.speed = 5;
         this.friction = 0.8;
         this.velX = 0;
@@ -32,18 +31,15 @@ export class Character extends Rect {
         this.isMovingRight = false;
     }
 
-    jump() {
+    jump(): this {
+
         if (!this.isJumpDisabled && !this.isJumping) {
             this.isJumpDisabled = true;
             this.isJumping = true;
             this.velY -= this.speed * 2;
         }
-    }
 
-    moveHandler(action: 'right' | 'left') {
-
-        this.isMovingRight = action === 'right';
-        this.isMovingLeft = action === 'left';
+        return this;
     }
 
     update(): this {
@@ -70,26 +66,48 @@ export class Character extends Rect {
             }
         }
 
-        // Jump
-        if (this.isJumping) {
-            this.velY += 0.5;
-        }
+        // Gravity must always push down
+        this.velY += 0.5;
+
+        this.x += this.velX;
+        this.y += this.velY;
 
         return this;
+    }
+
+    collisionHandler(side: 'top' | 'right' | 'bottom' | 'left', depth: number) {
+
+        // Stop character horizontal movement
+        if (side === 'left' || side === 'right') {
+            this.velX = 0;
+        }
+
+        switch (side) {
+            case 'left':
+                this.x += depth;
+                break;
+            case 'right':
+                this.x -= depth;
+                break;
+            case 'top':
+                this.y += depth;
+                // Update vertical movement
+                this.velY = 0;
+                break;
+            case 'bottom':
+                this.y -= depth;
+                // Stop vertical movement if character is moving down
+                if (this.velY > 0) {
+                    this.isJumping = false;
+                    this.velY = 0;
+                }
+                break;
+        }
     }
 
     render(): this {
 
         let { context } = this;
-
-        this.x += this.velX;
-        this.y += this.velY;
-
-        if (this.y >= 258) {
-            this.y = 258;
-            this.velY = 0;
-            this.isJumping = false;
-        }
 
         context.fillStyle = this.fillStyle;
         super.render();
