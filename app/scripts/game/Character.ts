@@ -1,4 +1,4 @@
-import { GRAVITY } from './constants';
+import { GRAVITY } from './utils/constants';
 import { Rect } from '../utils/canvas/Rect';
 
 export class Character extends Rect {

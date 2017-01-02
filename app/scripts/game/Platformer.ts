@@ -1,4 +1,4 @@
-import { checkForCollision } from './checkForCollision';
+import { checkForCollision } from './utils/checkForCollision';
 import { Stage } from './Stage';
 import { Character } from './Character';
 import { Obstacle } from './Obstacle';
