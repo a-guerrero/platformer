@@ -1,3 +1,4 @@
+import { GRAVITY } from './constants';
 import { Rect } from '../utils/canvas/Rect';
 
 export class Character extends Rect {
@@ -18,8 +19,8 @@ export class Character extends Rect {
 
         this.width = 20;
         this.height = 30;
-        this.speed = 5;
-        this.friction = 0.8;
+        this.speed = 4;
+        this.friction = 0.75;
         this.velX = 0;
         this.velY = 0;
         this.fillStyle = 'black';
@@ -30,7 +31,8 @@ export class Character extends Rect {
 
     jump(): this {
 
-        // Abort if alreay jumping (user pressing jump key)
+        // Abort if already jumping (user pressing jump key) or if actually
+        // jumping (velY not being 0 means character is moving vertically)
         if (!this.isJumping && this.velY === 0) {
             this.isJumping = true;
             this.velY -= this.speed * 2;
@@ -64,9 +66,12 @@ export class Character extends Rect {
         }
 
         // Gravity must always push down
-        this.velY += 0.5;
+        this.velY += GRAVITY;
 
+        // Make speed || friction affect x
         this.x += this.velX;
+
+        // Make gravity affect y
         this.y += this.velY;
 
         return this;
@@ -95,7 +100,6 @@ export class Character extends Rect {
                 this.y -= depth;
                 // Stop vertical movement if character is moving down
                 if (this.velY > 0) {
-
                     this.velY = 0;
                 }
                 break;
