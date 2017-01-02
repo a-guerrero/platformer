@@ -3,10 +3,11 @@ import { Rect } from '../utils/canvas/Rect';
 
 export class Character extends Rect {
 
-    speed: number;
     friction: number;
-    velX: number;
-    velY: number;
+    xSpeed: number;
+    ySpeed: number;
+    xVel: number;
+    yVel: number;
     fillStyle: string | CanvasGradient | CanvasPattern;
     isDeath: boolean;
     isJumping: boolean;
@@ -20,10 +21,11 @@ export class Character extends Rect {
 
         this.width = 20;
         this.height = 30;
-        this.speed = 4;
         this.friction = 0.75;
-        this.velX = 0;
-        this.velY = 0;
+        this.xSpeed = 4;
+        this.ySpeed = 8;
+        this.xVel = 0;
+        this.yVel = 0;
         this.fillStyle = 'black';
         this.isDeath = false;
         this.isJumping = false;
@@ -35,11 +37,11 @@ export class Character extends Rect {
 
         // Ends horizontal moving completly
         this.stopMove();
-        this.velX = 0;
+        this.xVel = 0;
 
         // Ends vertical moving completly
         this.stopJump();
-        this.velY = 0;
+        this.yVel = 0;
 
         this.isDeath = true;
 
@@ -68,10 +70,10 @@ export class Character extends Rect {
     jump(): this {
 
         // Abort if already jumping (user pressing jump key) or if actually
-        // jumping (velY not being 0 means character is moving vertically)
-        if (!this.isJumping && this.velY === 0) {
+        // jumping (yVel not being 0 means character is moving vertically)
+        if (!this.isJumping && this.yVel === 0) {
             this.isJumping = true;
-            this.velY -= this.speed * 2;
+            this.yVel -= this.ySpeed;
         }
 
         return this;
@@ -91,34 +93,34 @@ export class Character extends Rect {
 
             // Move right
             if (this.isMovingRight) {
-                if (this.velX < this.speed) {
-                    this.velX++;
+                if (this.xVel < this.xSpeed) {
+                    this.xVel++;
                 }
             }
             // Move left
             else if (this.isMovingLeft) {
-                if (this.velX > -this.speed) {
-                    this.velX--;
+                if (this.xVel > -this.xSpeed) {
+                    this.xVel--;
                 }
             }
             // Slow down and stop it
-            else if (this.velX !== 0) {
-                if (Math.abs(this.velX) < 0.05) {
-                    this.velX = 0;
+            else if (this.xVel !== 0) {
+                if (Math.abs(this.xVel) < 0.05) {
+                    this.xVel = 0;
                 }
                 else {
-                    this.velX *= this.friction;
+                    this.xVel *= this.friction;
                 }
             }
 
             // Gravity must always push down
-            this.velY += GRAVITY;
+            this.yVel += GRAVITY;
 
             // Make speed || friction affect x
-            this.x += this.velX;
+            this.x += this.xVel;
 
             // Make gravity affect y
-            this.y += this.velY;
+            this.y += this.yVel;
         }
 
         return this;
@@ -137,7 +139,7 @@ export class Character extends Rect {
                 case 'top':
                     this.y += depth;
                     // Update vertical movement
-                    this.velY = 0;
+                    this.yVel = 0;
                     break;
                 case 'bottom':
                     this.y -= depth;
@@ -146,12 +148,12 @@ export class Character extends Rect {
 
             // Stop character horizontal movement
             if (side === 'left' || side === 'right') {
-                this.velX = 0;
+                this.xVel = 0;
             }
 
             // Stop vertical movement if character is moving down
-            if (side === 'bottom' && this.velY > 0) {
-                this.velY = 0;
+            if (side === 'bottom' && this.yVel > 0) {
+                this.yVel = 0;
             }
         }
 
