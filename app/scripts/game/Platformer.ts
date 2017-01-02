@@ -34,9 +34,9 @@ export class Platformer {
         this
             .bind()
             .setObstacleArr()
-            //.update();
+            .update();
 
-        setInterval(() => { this.update(); }, 250 );
+        // setInterval(() => { this.update(); }, 250 );
     }
 
     private setObstacleArr(): this {
@@ -96,9 +96,7 @@ export class Platformer {
             protagonist.isMovingLeft = true;
         }
         if (keyCode === 38 || keyCode === 32) {
-            if (!protagonist.isJumpDisabled) {
-                protagonist.jump();
-            }
+            protagonist.jump();
         }
     }
 
@@ -114,7 +112,7 @@ export class Platformer {
             protagonist.isMovingLeft = false;
         }
         if (keyCode === 38 || keyCode === 32) {
-            protagonist.isJumpDisabled = false;
+            protagonist.isJumping = false;
         }
     }
 
@@ -138,7 +136,7 @@ export class Platformer {
         });
 
         protagonist.render();
-        // requestAnimationFrame(this.update.bind(this));
+        requestAnimationFrame(this.update.bind(this));
 
         return this;
     }

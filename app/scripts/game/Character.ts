@@ -8,7 +8,6 @@ export class Character extends Rect {
     velY: number;
     fillStyle: string;
     isJumping: boolean;
-    isJumpDisabled: boolean;
     isGrounded: boolean;
     isMovingLeft: boolean;
     isMovingRight: boolean;
@@ -25,16 +24,14 @@ export class Character extends Rect {
         this.velY = 0;
         this.fillStyle = 'black';
         this.isJumping = false;
-        this.isJumpDisabled = false;
-        this.isGrounded = false;
         this.isMovingLeft = false;
         this.isMovingRight = false;
     }
 
     jump(): this {
 
-        if (!this.isJumpDisabled && !this.isJumping) {
-            this.isJumpDisabled = true;
+        // Abort if alreay jumping (user pressing jump key)
+        if (!this.isJumping && this.velY === 0) {
             this.isJumping = true;
             this.velY -= this.speed * 2;
         }
@@ -98,7 +95,7 @@ export class Character extends Rect {
                 this.y -= depth;
                 // Stop vertical movement if character is moving down
                 if (this.velY > 0) {
-                    this.isJumping = false;
+
                     this.velY = 0;
                 }
                 break;
