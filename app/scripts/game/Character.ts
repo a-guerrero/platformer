@@ -8,6 +8,7 @@ export class Character extends Rect {
     velX: number;
     velY: number;
     fillStyle: string | CanvasGradient | CanvasPattern;
+    isDeath: boolean;
     isJumping: boolean;
     isGrounded: boolean;
     isMovingLeft: boolean;
@@ -24,9 +25,35 @@ export class Character extends Rect {
         this.velX = 0;
         this.velY = 0;
         this.fillStyle = 'black';
+        this.isDeath = false;
         this.isJumping = false;
         this.isMovingLeft = false;
         this.isMovingRight = false;
+    }
+
+    kill(): this {
+
+        this.stop(true);
+        this.isDeath = true;
+
+        return this;
+    }
+
+    stop(xy: boolean): this;
+    stop(x: boolean, y: boolean): this;
+    stop(x: boolean, y?: boolean): this {
+
+        if (x) {
+            this.velX = 0;
+            this.isMovingRight = false;
+            this.isMovingLeft = false;
+        }
+
+        if (y || (typeof y !== 'boolean' && x)) {
+            this.velY = 0;
+        }
+
+        return this;
     }
 
     jump(): this {
@@ -43,67 +70,80 @@ export class Character extends Rect {
 
     update(): this {
 
-        // Move right
-        if (this.isMovingRight) {
-            if (this.velX < this.speed) {
-                this.velX++;
-            }
-        }
-        // Move left
-        else if (this.isMovingLeft) {
-            if (this.velX > -this.speed) {
-                this.velX--;
-            }
-        }
-        // Slow down and stop it
-        else if (this.velX !== 0) {
-            if (Math.abs(this.velX) < 0.05) {
-                this.velX = 0;
-            }
-            else {
-                this.velX *= this.friction;
-            }
-        }
+        if (!this.isDeath) {
 
-        // Gravity must always push down
-        this.velY += GRAVITY;
+            if (this.speed === 0.25) {
+                // console.log(this.isMovingRight, this.isMovingLeft);
+            }
 
-        // Make speed || friction affect x
-        this.x += this.velX;
+            // Move right
+            if (this.isMovingRight) {
+                if (this.velX < this.speed) {
+                    this.velX++;
+                }
+            }
+            // Move left
+            else if (this.isMovingLeft) {
+                if (this.velX > -this.speed) {
+                    this.velX--;
+                }
+            }
+            // Slow down and stop it
+            else if (this.velX !== 0) {
+                if (Math.abs(this.velX) < 0.05) {
+                    this.velX = 0;
+                }
+                else {
+                    this.velX *= this.friction;
+                }
+            }
 
-        // Make gravity affect y
-        this.y += this.velY;
+            // Gravity must always push down
+            this.velY += GRAVITY;
+
+            // Make speed || friction affect x
+            this.x += this.velX;
+
+            // Make gravity affect y
+            this.y += this.velY;
+        }
 
         return this;
     }
 
-    collisionHandler(side: 'top' | 'right' | 'bottom' | 'left', depth: number) {
+    collisionHandler(side: 'top' | 'right' | 'bottom' | 'left', depth: number): this {
 
-        // Stop character horizontal movement
-        if (side === 'left' || side === 'right') {
-            this.velX = 0;
-        }
-
-        switch (side) {
-            case 'left':
-                this.x += depth;
-                break;
-            case 'right':
-                this.x -= depth;
-                break;
-            case 'top':
-                this.y += depth;
-                // Update vertical movement
-                this.velY = 0;
-                break;
-            case 'bottom':
-                this.y -= depth;
-                // Stop vertical movement if character is moving down
-                if (this.velY > 0) {
+        if (!this.isDeath) {
+            switch (side) {
+                case 'left':
+                    this.x += depth;
+                    break;
+                case 'right':
+                    this.x -= depth;
+                    break;
+                case 'top':
+                    this.y += depth;
+                    // Update vertical movement
                     this.velY = 0;
-                }
-                break;
+                    break;
+                case 'bottom':
+                    this.y -= depth;
+                    break;
+            }
+
+            // Stop character horizontal movement
+            if (side === 'left' || side === 'right') {
+                this.velX = 0;
+                // this.stop(true, false);
+            }
+
+            // Stop vertical movement if character is moving down
+            if (side === 'bottom' && this.velY > 0) {
+                this.stop(false, true);
+            }
         }
+
+        return this;
     }
 
     render(): this {
