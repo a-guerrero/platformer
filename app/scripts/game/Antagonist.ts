@@ -4,7 +4,7 @@ export class Antagonist extends Character {
 
     canJump: boolean;
     jumpWait: number;
-    private jumpFrameCount: number;
+    private jumpWaitCount: number;
 
     constructor(public context: CanvasRenderingContext2D) {
 
@@ -18,18 +18,18 @@ export class Antagonist extends Character {
         // Defaults
         this.canJump = false;
         this.jumpWait = 25;
-        this.jumpFrameCount = 0;
+        this.jumpWaitCount = 0;
     }
 
     update(): this {
 
         if (!this.isJumping) {
             // Wait some frames before jumping
-            if (this.jumpFrameCount++ === this.jumpWait) {
+            if (this.jumpWaitCount++ === this.jumpWait) {
                 // Jump
                 this.jump();
                 // Reset jump frame count
-                this.jumpFrameCount = 0;
+                this.jumpWaitCount = 0;
             }
         }
 
