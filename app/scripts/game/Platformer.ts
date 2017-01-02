@@ -18,6 +18,8 @@ export class Platformer {
     private antagonist: Antagonist;
     private obstacleArr: Obstacle[];
 
+    private isJumpKeyPressed: boolean;
+
     constructor(public canvas: Canvas) {
 
         canvas.elem.width = canvas.width;
@@ -37,6 +39,8 @@ export class Platformer {
         this.antagonist.y = this.stage.height - this.antagonist.height;
         this.antagonist.x = 80;
         this.antagonist.isMovingRight = true;
+
+        this.isJumpKeyPressed = false;
 
         this
             .bind()
@@ -101,7 +105,11 @@ export class Platformer {
             protagonist.move('left');
         }
         if (keyCode === 38 || keyCode === 32) {
-            protagonist.jump();
+            // Prevent continuous jumping
+            if (!this.isJumpKeyPressed) {
+                protagonist.jump();
+                this.isJumpKeyPressed = true;
+            }
         }
     }
 
@@ -117,7 +125,7 @@ export class Platformer {
             protagonist.stopMove('left');
         }
         if (keyCode === 38 || keyCode === 32) {
-            protagonist.stopJump();
+            this.isJumpKeyPressed = false;
         }
     }
 
@@ -128,10 +136,7 @@ export class Platformer {
         canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         protagonist.update();
-
-        antagonist
-            .jump()
-            .update();
+        antagonist.update();
 
         obstacleArr.forEach(obstacle => {
 
