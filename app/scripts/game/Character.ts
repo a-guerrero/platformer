@@ -74,8 +74,8 @@ export class Character extends Rect {
 
     jump(): this {
 
-        // Abort if already jumping
-        if (!this.isJumping) {
+        // Abort if already jumping or not grounded (falling down from a cliff)
+        if (!this.isJumping && this.yVel === 0) {
             this.isJumping = true;
             this.yVel -= this.ySpeed;
         }
