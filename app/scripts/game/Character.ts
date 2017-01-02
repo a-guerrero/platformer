@@ -15,6 +15,9 @@ export class Character extends Rect {
     isMovingLeft: boolean;
     isMovingRight: boolean;
 
+    clearWait: number;
+    private clearWaitCount: number;
+
     constructor(public context: CanvasRenderingContext2D) {
 
         super(context);
@@ -31,6 +34,8 @@ export class Character extends Rect {
         this.isJumping = false;
         this.isMovingLeft = false;
         this.isMovingRight = false;
+        this.clearWait = 10;
+        this.clearWaitCount = 0;
     }
 
     kill(): this {
@@ -158,6 +163,14 @@ export class Character extends Rect {
     render(): this {
 
         let { context } = this;
+
+        if (this.isDeath) {
+            if (this.clearWaitCount === this.clearWait) {
+                // Avoid rendering
+                return this;
+            }
+            this.clearWaitCount++;
+        }
 
         context.fillStyle = this.fillStyle;
         super.render();
