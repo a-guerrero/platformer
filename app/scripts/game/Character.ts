@@ -7,7 +7,7 @@ export class Character extends Rect {
     friction: number;
     velX: number;
     velY: number;
-    fillStyle: string;
+    fillStyle: string | CanvasGradient | CanvasPattern;
     isJumping: boolean;
     isGrounded: boolean;
     isMovingLeft: boolean;

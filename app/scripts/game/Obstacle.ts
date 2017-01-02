@@ -2,7 +2,7 @@ import { Rect } from '../utils/canvas/Rect';
 
 export class Obstacle extends Rect {
 
-    fillStyle: string;
+    fillStyle: string | CanvasGradient | CanvasPattern;
 
     constructor(public context: CanvasRenderingContext2D) {
         super(context);
