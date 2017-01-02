@@ -33,25 +33,34 @@ export class Character extends Rect {
 
     kill(): this {
 
-        this.stop(true);
+        // Ends horizontal moving completly
+        this.stopMove();
+        this.velX = 0;
+
+        // Ends vertical moving completly
+        this.stopJump();
+        this.velY = 0;
+
         this.isDeath = true;
 
         return this;
     }
 
-    stop(xy: boolean): this;
-    stop(x: boolean, y: boolean): this;
-    stop(x: boolean, y?: boolean): this {
+    move(action: 'right' | 'left'): this {
 
-        if (x) {
-            this.velX = 0;
-            this.isMovingRight = false;
-            this.isMovingLeft = false;
+        if (!this.isDeath) {
+            this.isMovingLeft = action === 'left';
+            this.isMovingRight = action === 'right';
         }
 
-        if (y || (typeof y !== 'boolean' && x)) {
-            this.velY = 0;
-        }
+        return this;
+    }
+
+    stopMove(action?: 'right' | 'left', sharp = false): this {
+
+        // End horizontal moving smoothly
+        this.isMovingRight = !action || action === 'right' ? false : this.isMovingRight;
+        this.isMovingLeft = !action || action === 'left' ? false : this.isMovingLeft;
 
         return this;
     }
@@ -68,13 +77,17 @@ export class Character extends Rect {
         return this;
     }
 
+    stopJump(): this {
+
+        // Unblocks jumping
+        this.isJumping = false;
+
+        return this;
+    }
+
     update(): this {
 
         if (!this.isDeath) {
-
-            if (this.speed === 0.25) {
-                // console.log(this.isMovingRight, this.isMovingLeft);
-            }
 
             // Move right
             if (this.isMovingRight) {
@@ -134,12 +147,11 @@ export class Character extends Rect {
             // Stop character horizontal movement
             if (side === 'left' || side === 'right') {
                 this.velX = 0;
-                // this.stop(true, false);
             }
 
             // Stop vertical movement if character is moving down
             if (side === 'bottom' && this.velY > 0) {
-                this.stop(false, true);
+                this.velY = 0;
             }
         }
 

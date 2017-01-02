@@ -1,6 +1,7 @@
 import { checkForCollision } from './utils/checkForCollision';
 import { Stage } from './Stage';
 import { Character } from './Character';
+import { Antagonist } from './Antagonist';
 import { Obstacle } from './Obstacle';
 
 interface Canvas {
@@ -14,6 +15,7 @@ export class Platformer {
 
     private stage: Stage;
     private protagonist: Character;
+    private antagonist: Antagonist;
     private obstacleArr: Obstacle[];
 
     constructor(public canvas: Canvas) {
@@ -28,8 +30,13 @@ export class Platformer {
         this.stage.xTranslateEnd = this.stage.width - (canvas.width / 2);
 
         this.protagonist = new Character(canvas.ctx);
-        this.protagonist.y = canvas.height - this.protagonist.height;
+        this.protagonist.y = this.stage.height - this.protagonist.height;
         this.protagonist.fillStyle = 'indianred';
+
+        this.antagonist = new Antagonist(canvas.ctx);
+        this.antagonist.y = this.stage.height - this.antagonist.height;
+        this.antagonist.x = 80;
+        this.antagonist.isMovingRight = true;
 
         this
             .bind()
@@ -50,9 +57,7 @@ export class Platformer {
             // Right wall
             { x: stage.width - 10, y: 0, width: 20, height: stage.height },
             // Bards
-            { x: 40,  y: stage.height - 70, width: 40, height: 60 },
-            { x: 120, y: stage.height - 70, width: 40, height: 60 },
-            { x: 200, y: stage.height - 70, width: 40, height: 60 },
+            { x: 40, y: stage.height - 70, width: 40, height: 60 },
             { x: 280, y: stage.height - 70, width: 40, height: 60 }
         ];
 
@@ -90,10 +95,10 @@ export class Platformer {
         let keyCode = e.keyCode
 
         if (keyCode === 39) {
-            protagonist.isMovingRight = true;
+            protagonist.move('right');
         }
         if (keyCode === 37) {
-            protagonist.isMovingLeft = true;
+            protagonist.move('left');
         }
         if (keyCode === 38 || keyCode === 32) {
             protagonist.jump();
@@ -106,36 +111,56 @@ export class Platformer {
         let keyCode = e.keyCode
 
         if (keyCode === 39) {
-            protagonist.isMovingRight = false;
+            protagonist.stopMove('right');
         }
         if (keyCode === 37) {
-            protagonist.isMovingLeft = false;
+            protagonist.stopMove('left');
         }
         if (keyCode === 38 || keyCode === 32) {
-            protagonist.isJumping = false;
+            protagonist.stopJump();
         }
     }
 
     private update(): this {
 
-        let { canvas, stage, protagonist, obstacleArr } = this;
+        let { canvas, stage, protagonist, antagonist, obstacleArr } = this;
 
         canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         protagonist.update();
 
+        antagonist
+            .jump()
+            .update();
+
         obstacleArr.forEach(obstacle => {
 
-            let collision = checkForCollision(protagonist, obstacle, true);
+            let protagonistCollision = checkForCollision(protagonist, obstacle, true);
+            if (typeof protagonistCollision === 'object') {
+                protagonist.collisionHandler(
+                    protagonistCollision.side,
+                    protagonistCollision.depth);
+            }
 
-            if (typeof collision === 'object') {
-                protagonist.collisionHandler(collision.side, collision.depth);
+            let antagonistCollison = checkForCollision(antagonist, obstacle, true);
+            if (typeof antagonistCollison === 'object') {
+                antagonist.collisionHandler(
+                    antagonistCollison.side,
+                    antagonistCollison.depth);
+            }
+
+            let mortalCollision = checkForCollision(protagonist, antagonist);
+            if (mortalCollision) {
+                protagonist.kill();
+                antagonist.kill();
             }
 
             obstacle.render();
         });
 
+        antagonist.render();
         protagonist.render();
+
         requestAnimationFrame(this.update.bind(this));
 
         return this;
