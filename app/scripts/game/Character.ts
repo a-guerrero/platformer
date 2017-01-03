@@ -9,7 +9,7 @@ export class Character extends Rect {
     friction = 0.75;
     xSpeed = 4;
     ySpeed = 8;
-    clearWait = 10;
+    clearWait = 25;
     lastMove: xDirections = 'right';
     fillStyle: CanvasFillStyle = 'black';
     sprite: Sprite;

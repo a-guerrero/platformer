@@ -17,11 +17,14 @@ export class Platformer {
 
     private stage: Stage;
     private protagonist: Character;
-    private antagonist: Antagonist;
+    private antagonistArr: Antagonist[];
     private obstacleArr: Obstacle[];
 
     private isJumpKeyPressed: boolean;
     private isShootKeyPressed: boolean;
+
+    private _endLoop: boolean;
+    private _endLoopCount: number;
 
     constructor(public canvas: Canvas) {
 
@@ -40,19 +43,16 @@ export class Platformer {
         this.protagonist.y = (this.stage.innerHeight / 2) - this.protagonist.height;
         this.protagonist.fillStyle = 'indianred';
 
-        this.antagonist = new Antagonist(canvas.ctx);
-        this.antagonist.y = this.stage.innerHeight - this.antagonist.height;
-        this.antagonist.x = 80;
-        this.antagonist.canJump = true;
-        this.antagonist.canShoot = true;
-        this.antagonist.move('right');
-
         this.isJumpKeyPressed = false;
         this.isShootKeyPressed = false;
+
+        this._endLoop = false;
+        this._endLoopCount = 0;
 
         this
             .bind()
             .setObstacleArr()
+            .setAntagonistArray()
             .update();
 
         // setInterval(() => { this.update(); }, 250);
@@ -88,6 +88,35 @@ export class Platformer {
             if (obj.canKill) obstacle.canKill = obj.canKill;
 
             this.obstacleArr.push(obstacle);
+        });
+
+        return this;
+    }
+
+    private setAntagonistArray(): this {
+
+        let { stage, canvas } = this;
+
+        const antagonistData = <Antagonist[]>[
+            { y: this.stage.innerHeight - 30, x: 80, canJump: true, canShoot: true, canMove: true },
+            { y: this.stage.innerHeight - 30, x: 120, canMove: true, lastMove: 'left', fillStyle: 'gray' }
+        ];
+
+        this.antagonistArr = [];
+        antagonistData.forEach(obj => {
+
+            let antagonist = new Antagonist(canvas.ctx);
+
+            antagonist.x = obj.x;
+            antagonist.y = obj.y;
+
+            if (obj.lastMove) antagonist.lastMove = obj.lastMove;
+            if (obj.canMove) antagonist.canMove = obj.canMove;
+            if (obj.canJump) antagonist.canJump = obj.canJump;
+            if (obj.canShoot) antagonist.canShoot = obj.canShoot;
+            if (obj.fillStyle) antagonist.fillStyle = obj.fillStyle;
+
+            this.antagonistArr.push(antagonist);
         });
 
         return this;
@@ -154,30 +183,29 @@ export class Platformer {
 
     private update(): this {
 
-        let { canvas, stage, protagonist, antagonist, obstacleArr } = this;
+        let { canvas, stage, protagonist, antagonistArr, obstacleArr } = this;
 
         canvas.ctx.clearRect(-stage.x, stage.y, stage.outerWidth, stage.outerHeight);
 
         protagonist.update();
-        antagonist.update();
-
         protagonist.bulletArr.forEach(bullet => { bullet.update() });
-        antagonist.bulletArr.forEach(bullet => { bullet.update() });
-
         protagonist.bulletArr.forEach((bullet, i) => {
 
             this
                 .cleanBulletArr(protagonist.bulletArr, i, bullet)
-                .checkForShotCharacter(bullet, [antagonist])
+                .checkForShotCharacter(bullet, antagonistArr)
                 .checkForBulletCollision(bullet, obstacleArr);
         });
 
-        antagonist.bulletArr.forEach((bullet, i) => {
-
-            this
-                .cleanBulletArr(antagonist.bulletArr, i, bullet)
-                .checkForShotCharacter(bullet, [protagonist])
-                .checkForBulletCollision(bullet, obstacleArr);
+        antagonistArr.forEach(antagonist => {
+            antagonist.update();
+            antagonist.bulletArr.forEach(bullet => { bullet.update() });
+            antagonist.bulletArr.forEach((bullet, i) => {
+                this
+                    .cleanBulletArr(antagonist.bulletArr, i, bullet)
+                    .checkForShotCharacter(bullet, [protagonist])
+                    .checkForBulletCollision(bullet, obstacleArr);
+            });
         });
 
         obstacleArr.forEach(obstacle => {
@@ -193,31 +221,49 @@ export class Platformer {
                 }
             }
 
-            let antagonistCollison = checkForCollision(antagonist, obstacle, true);
-            if (typeof antagonistCollison === 'object') {
-                antagonist.collisionHandler(
-                    antagonistCollison.side,
-                    antagonistCollison.depth);
-            }
+            antagonistArr.forEach(antagonist => {
 
-            let mortalCollision = checkForCollision(protagonist, antagonist);
-            if (mortalCollision) {
-                protagonist.kill();
-                antagonist.kill();
-            }
+                let antagonistCollison = checkForCollision(antagonist, obstacle, true);
+                if (typeof antagonistCollison === 'object') {
+                    antagonist.collisionHandler(
+                        antagonistCollison.side,
+                        antagonistCollison.depth);
+                }
+
+                if (!antagonist.isDeath) {
+                    let mortalCollision = checkForCollision(protagonist, antagonist);
+                    if (mortalCollision) {
+                        protagonist.kill();
+                        antagonist.kill();
+                    }
+                }
+            });
 
             obstacle.render();
         });
 
-        antagonist.bulletArr.forEach(bullet => { bullet.render(); });
-        protagonist.bulletArr.forEach(bullet => { bullet.render(); });
+        antagonistArr.forEach(antagonist => {
+            antagonist.bulletArr.forEach(bullet => { bullet.render(); });
+            antagonist.render();
+        });
 
-        antagonist.render();
+        protagonist.bulletArr.forEach(bullet => { bullet.render(); });
         protagonist.render();
 
         stage.x = protagonist.x;
         stage.render();
 
+        if (this._endLoop) {
+            if (this._endLoopCount === this.protagonist.clearWait - 2) {
+                // Reload website
+                location.reload();
+                // Avoid rendering
+                return this;
+            }
+            this._endLoopCount++;
+        }
+
+        this._endLoop = this.protagonist.isDeath;
         requestAnimationFrame(this.update.bind(this));
 
         return this;

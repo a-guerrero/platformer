@@ -7,6 +7,7 @@ export class Antagonist extends Character {
     shootWait = 50;
     jumpWait = 10;
 
+    protected _canMove = false;
     protected _shootWaitCount = 0;
     protected _jumpWaitCount = 0;
 
@@ -29,6 +30,15 @@ export class Antagonist extends Character {
         this.canJump = false;
         this.jumpWait = 25;
         this._jumpWaitCount = 0;
+    }
+
+    set canMove(val: boolean) {
+        this.move(this.lastMove);
+        this._canMove = true;
+    }
+
+    get canMove() {
+        return this._canMove;
     }
 
     update(): this {
