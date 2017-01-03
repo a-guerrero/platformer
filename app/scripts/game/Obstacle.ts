@@ -2,7 +2,8 @@ import { Rect } from '../utils/canvas/Rect';
 
 export class Obstacle extends Rect {
 
-    fillStyle: CanvasFillStyle;
+    canKill = false;
+    fillStyle: CanvasFillStyle  = 'black';
 
     constructor(public context: CanvasRenderingContext2D) {
         super(context);

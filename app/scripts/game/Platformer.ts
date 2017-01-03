@@ -37,7 +37,7 @@ export class Platformer {
         this.stage.xTranslateEnd = this.stage.innerWidth - (canvas.width / 2);
 
         this.protagonist = new Character(canvas.ctx);
-        this.protagonist.y = this.stage.innerHeight - this.protagonist.height;
+        this.protagonist.y = (this.stage.innerHeight / 2) - this.protagonist.height;
         this.protagonist.fillStyle = 'indianred';
 
         this.antagonist = new Antagonist(canvas.ctx);
@@ -61,16 +61,18 @@ export class Platformer {
     private setObstacleArr(): this {
 
         let { stage, canvas } = this;
-        let obstaclesData = [
+        let obstaclesData = <Obstacle[]>[
             // Ground
             { x: 0, y: stage.innerHeight - 10, width: stage.innerWidth, height: 20 },
-            // Left wall
-            { x: -10, y: 0, width: 20, height: stage.innerHeight },
-            // Right wall
-            { x: stage.innerWidth - 10, y: 0, width: 20, height: stage.innerHeight },
+            // Left wall (hidden)
+            { x: -20, y: 0, width: 20, height: stage.innerHeight },
+            // Right wall (hidden)
+            { x: stage.innerWidth + 20, y: 0, width: 20, height: stage.innerHeight },
             // Bards
             { x: 40, y: stage.innerHeight - 70, width: 40, height: 60 },
-            { x: 280, y: stage.innerHeight - 70, width: 40, height: 60 }
+            { x: 280, y: stage.innerHeight - 70, width: 40, height: 60 },
+            // Lava
+            { x: 320, y: stage.innerHeight - 30, width: 100, height: 20, fillStyle: 'red', canKill: true }
         ];
 
         this.obstacleArr = [];
@@ -81,6 +83,9 @@ export class Platformer {
             obstacle.y = obj.y;
             obstacle.width = obj.width;
             obstacle.height = obj.height;
+
+            if (obj.fillStyle) obstacle.fillStyle = obj.fillStyle;
+            if (obj.canKill) obstacle.canKill = obj.canKill;
 
             this.obstacleArr.push(obstacle);
         });
@@ -182,6 +187,10 @@ export class Platformer {
                 protagonist.collisionHandler(
                     protagonistCollision.side,
                     protagonistCollision.depth);
+
+                if (obstacle.canKill) {
+                    protagonist.kill();
+                }
             }
 
             let antagonistCollison = checkForCollision(antagonist, obstacle, true);
