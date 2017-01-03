@@ -2,7 +2,8 @@ import { Rect } from '../utils/canvas/Rect';
 
 export class Bullet extends Rect {
 
-    xSpeed= 12;
+    xSpeed = 12;
+    remove = false;
     fillStyle: CanvasFillStyle = 'white';
 
     protected _isMovingLeft = false;
@@ -19,10 +20,6 @@ export class Bullet extends Rect {
 
     get isMovingLeft() { return this._isMovingLeft; }
     get isMovingRight() { return this._isMovingRight; }
-
-    dispose(): this {
-        return this;
-    }
 
     move(action: xDirections): this {
 
@@ -49,6 +46,19 @@ export class Bullet extends Rect {
             this.x += this._isMovingRight ? this.xSpeed : -this.xSpeed;
         }
 
+        return this;
+    }
+
+    collisionHandler(side: xyDirections, depth: number): this {
+
+        if (side === 'left') {
+            this.x += depth;
+        }
+        if (side === 'right') {
+            this.x -= depth;
+        }
+
+        this.remove = true;
         return this;
     }
 

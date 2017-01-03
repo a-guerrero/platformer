@@ -1,7 +1,9 @@
+import { Rect } from '../utils/canvas/Rect';
 import { checkForCollision } from './utils/checkForCollision';
 import { Stage } from './Stage';
 import { Character } from './Character';
 import { Antagonist } from './Antagonist';
+import { Bullet } from './Bullet';
 import { Obstacle } from './Obstacle';
 
 interface Canvas {
@@ -40,6 +42,7 @@ export class Platformer {
         this.antagonist.y = this.stage.height - this.antagonist.height;
         this.antagonist.x = 80;
         this.antagonist.canJump = true;
+        this.antagonist.canShoot = true;
         this.antagonist.move('right');
 
         this.isJumpKeyPressed = false;
@@ -50,7 +53,7 @@ export class Platformer {
             .setObstacleArr()
             .update();
 
-        // setInterval(() => { this.update(); }, 250 );
+        // setInterval(() => { this.update(); }, 250);
     }
 
     private setObstacleArr(): this {
@@ -151,6 +154,25 @@ export class Platformer {
         protagonist.update();
         antagonist.update();
 
+        protagonist.bulletArr.forEach(bullet => { bullet.update() });
+        antagonist.bulletArr.forEach(bullet => { bullet.update() });
+
+        protagonist.bulletArr.forEach((bullet, i) => {
+
+            this
+                .cleanBulletArr(protagonist.bulletArr, i, bullet)
+                .checkForShotCharacter(bullet, [antagonist])
+                .checkForBulletCollision(bullet, obstacleArr);
+        });
+
+        antagonist.bulletArr.forEach((bullet, i) => {
+
+            this
+                .cleanBulletArr(antagonist.bulletArr, i, bullet)
+                .checkForShotCharacter(bullet, [protagonist])
+                .checkForBulletCollision(bullet, obstacleArr);
+        });
+
         obstacleArr.forEach(obstacle => {
 
             let protagonistCollision = checkForCollision(protagonist, obstacle, true);
@@ -176,10 +198,61 @@ export class Platformer {
             obstacle.render();
         });
 
+        antagonist.bulletArr.forEach(bullet => { bullet.render(); });
+        protagonist.bulletArr.forEach(bullet => { bullet.render(); });
+
         antagonist.render();
         protagonist.render();
 
         requestAnimationFrame(this.update.bind(this));
+
+        return this;
+    }
+
+    /** Cleans bullets that are out of sight */
+    private cleanBulletArr(bulletArr: Bullet[], index: number, bullet: Bullet): this {
+
+        let { canvas, stage } = this;
+
+        // Check if is out of sight
+        if (bullet.remove || (bullet.x < 0 || bullet.x > stage.x + canvas.width)) {
+            // Remove from array
+            bulletArr.splice(index, 1);
+        }
+
+        return this;
+    }
+
+    /** Checks if bullet has collided with a Character */
+    private checkForShotCharacter(bullet: Bullet, characterArr: Character[]): this {
+
+        characterArr.forEach(character => {
+
+            if (!character.isDeath) {
+                this.checkForBulletCollision(bullet, [character], (character: Character) => {
+                    character.kill();
+                });
+            }
+        })
+
+        return this;
+    }
+
+    /** Checks if a bullet has collided with another Rect */
+    private checkForBulletCollision(bullet: Bullet, targetArr: Rect[], handler?: (rect: Rect) => void): this {
+
+        targetArr.forEach(target => {
+
+            let collision = checkForCollision(bullet, target, true);
+
+            if (typeof collision === 'object') {
+                bullet.collisionHandler(collision.side, collision.depth);
+
+                if (typeof handler === 'function') {
+                    handler(target);
+                }
+            }
+        });
 
         return this;
     }

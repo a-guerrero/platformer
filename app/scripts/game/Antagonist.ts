@@ -33,19 +33,21 @@ export class Antagonist extends Character {
 
     update(): this {
 
-        // Auto jumping
-        if (this.canJump && !this._isJumping) {
-            if (this._jumpWaitCount++ === this.jumpWait) {
-                this.jump();
-                this._jumpWaitCount = 0;
+        if (!this.isDeath) {
+            // Auto jumping
+            if (this.canJump && !this._isJumping) {
+                if (this._jumpWaitCount++ === this.jumpWait) {
+                    this.jump();
+                    this._jumpWaitCount = 0;
+                }
             }
-        }
 
-        // Auto shooting
-        if (this.canShoot) {
-            if (this._shootWaitCount++ === this.shootWait) {
-                this.shoot();
-                this._shootWaitCount = 0;
+            // Auto shooting
+            if (this.canShoot) {
+                if (this._shootWaitCount++ === this.shootWait) {
+                    this.shoot();
+                    this._shootWaitCount = 0;
+                }
             }
         }
 

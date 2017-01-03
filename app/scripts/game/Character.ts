@@ -98,7 +98,7 @@ export class Character extends Rect {
         return this;
     }
 
-    shoot() {
+    shoot(): this {
 
         let { context, x, y, width, height } = this;
 
@@ -108,6 +108,8 @@ export class Character extends Rect {
 
         bullet.move(this.lastMove);
         this._bulletArr.push(bullet);
+
+        return this;
     }
 
     update(): this {
@@ -144,11 +146,6 @@ export class Character extends Rect {
 
             // Make gravity affect y
             this.y += this._yVel;
-
-            // Update bullets
-            this._bulletArr.forEach(bullet => {
-                bullet.update();
-            });
         }
 
         return this;
@@ -203,10 +200,6 @@ export class Character extends Rect {
             }
             this._clearWaitCount++;
         }
-
-        _bulletArr.forEach(bullet => {
-            bullet.render();
-        });
 
         context.fillStyle = this.fillStyle;
         super.render();
