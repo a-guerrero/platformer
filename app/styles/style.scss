@@ -2,8 +2,11 @@
 
 html,
 body {
+    font-family: $helvetica;
     font-size: $em-base;
-    background: #fbfafa;
+    background: #eaeaea;
+    line-height: 1.5em;
+    color: #b5b5b5;
 
     @include size(100%);
 }
@@ -19,6 +22,14 @@ canvas {
 
 section {
     overflow: hidden;
+    width: 512px;
+    margin: 0 auto;
+}
+
+.o-message {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .h-no-display {
@@ -26,6 +37,8 @@ section {
 }
 
 #js-stage {
-    margin: 2em auto;
+    margin-top: 2em;
     @include size(512px 288px);
+    margin-bottom: 1.5em;
+    background: white;
 }
