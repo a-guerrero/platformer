@@ -2,51 +2,51 @@ import { Rect } from '../utils/canvas/Rect';
 
 export class Bullet extends Rect {
 
-    xSpeed: number;
-    fillStyle: string | CanvasGradient | CanvasPattern;
-    isMovingLeft: boolean;
-    isMovingRight: boolean;
+    xSpeed= 12;
+    fillStyle: CanvasFillStyle = 'white';
 
-    private firstUpdate: boolean;
+    protected _isMovingLeft = false;
+    protected _isMovingRight = false;
+    protected _firstUpdate = true;
 
     constructor(public context: CanvasRenderingContext2D) {
 
         super(context);
 
-        this.xSpeed = 12;
         this.width = 8;
         this.height = 8;
-        this.fillStyle = 'white';
-        this.firstUpdate = true;
     }
+
+    get isMovingLeft() { return this._isMovingLeft; }
+    get isMovingRight() { return this._isMovingRight; }
 
     dispose(): this {
         return this;
     }
 
-    move(action: 'right' | 'left'): this {
+    move(action: xDirections): this {
 
-        this.isMovingLeft = action === 'left';
-        this.isMovingRight = action === 'right';
+        this._isMovingLeft = action === 'left';
+        this._isMovingRight = action === 'right';
 
         return this;
     }
 
-    stopMove(action?: 'right' | 'left', sharp = false): this {
+    stopMove(action?: xDirections, sharp = false): this {
 
-        this.isMovingRight = !action || action === 'right' ? false : this.isMovingRight;
-        this.isMovingLeft = !action || action === 'left' ? false : this.isMovingLeft;
+        this._isMovingRight = !action || action === 'right' ? false : this._isMovingRight;
+        this._isMovingLeft = !action || action === 'left' ? false : this._isMovingLeft;
 
         return this;
     }
 
     update(): this {
 
-        if (this.firstUpdate) {
-            this.firstUpdate = false;
+        if (this._firstUpdate) {
+            this._firstUpdate = false;
         }
         else {
-            this.x += this.isMovingRight ? this.xSpeed : -this.xSpeed;
+            this.x += this._isMovingRight ? this.xSpeed : -this.xSpeed;
         }
 
         return this;

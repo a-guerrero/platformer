@@ -39,7 +39,8 @@ export class Platformer {
         this.antagonist = new Antagonist(canvas.ctx);
         this.antagonist.y = this.stage.height - this.antagonist.height;
         this.antagonist.x = 80;
-        this.antagonist.isMovingRight = true;
+        this.antagonist.canJump = true;
+        this.antagonist.move('right');
 
         this.isJumpKeyPressed = false;
         this.isShootKeyPressed = false;

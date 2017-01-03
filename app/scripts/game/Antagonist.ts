@@ -2,9 +2,9 @@ import { Character } from './Character';
 
 export class Antagonist extends Character {
 
-    canJump: boolean;
-    jumpWait: number;
-    private jumpWaitCount: number;
+    canJump = false;
+    jumpWait = 10;
+    protected _jumpWaitCount = 0;
 
     constructor(public context: CanvasRenderingContext2D) {
 
@@ -18,18 +18,18 @@ export class Antagonist extends Character {
         // Defaults
         this.canJump = false;
         this.jumpWait = 25;
-        this.jumpWaitCount = 0;
+        this._jumpWaitCount = 0;
     }
 
     update(): this {
 
-        if (!this.isJumping) {
+        if (this.canJump && !this._isJumping) {
             // Wait some frames before jumping
-            if (this.jumpWaitCount++ === this.jumpWait) {
+            if (this._jumpWaitCount++ === this.jumpWait) {
                 // Jump
                 this.jump();
                 // Reset jump frame count
-                this.jumpWaitCount = 0;
+                this._jumpWaitCount = 0;
             }
         }
 
@@ -39,15 +39,15 @@ export class Antagonist extends Character {
         return this;
     }
 
-    collisionHandler(side: 'top' | 'right' | 'bottom' | 'left', depth: number): this {
+    collisionHandler(side: xyDirections, depth: number): this {
 
         super.collisionHandler(side, depth);
 
         // Keep moving after side collision
-        if (!this.isDeath && (side === 'right' || side === 'left')) {
+        if (!this._isDeath && (side === 'right' || side === 'left')) {
 
-            this.isMovingLeft = side === 'right';
-            this.isMovingRight = side === 'left';
+            this._isMovingLeft = side === 'right';
+            this._isMovingRight = side === 'left';
         }
 
         return this;

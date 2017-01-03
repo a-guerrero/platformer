@@ -4,21 +4,21 @@ import { Bullet } from './Bullet';
 
 export class Character extends Rect {
 
-    friction: number;
-    xSpeed: number;
-    ySpeed: number;
-    xVel: number;
-    yVel: number;
-    fillStyle: string | CanvasGradient | CanvasPattern;
-    isDeath: boolean;
-    isJumping: boolean;
-    isMovingLeft: boolean;
-    isMovingRight: boolean;
-    lastMove: xDirections;
-    bulletArr: Bullet[];
+    friction = 0.75;
+    xSpeed = 4;
+    ySpeed = 8;
+    clearWait = 10;
+    lastMove: xDirections = 'right';
+    fillStyle: CanvasFillStyle = 'black';
 
-    clearWait: number;
-    private clearWaitCount: number;
+    protected _xVel = 0;
+    protected _yVel = 0;
+    protected _isDeath = false;
+    protected _isJumping = false;
+    protected _isMovingLeft = false;
+    protected _isMovingRight = false;
+    protected _clearWaitCount = 0;
+    protected _bulletArr: Bullet[] = [];
 
     constructor(public context: CanvasRenderingContext2D) {
 
@@ -26,42 +26,37 @@ export class Character extends Rect {
 
         this.width = 20;
         this.height = 30;
-        this.friction = 0.75;
-        this.xSpeed = 4;
-        this.ySpeed = 8;
-        this.xVel = 0;
-        this.yVel = 0;
-        this.fillStyle = 'black';
-        this.isDeath = false;
-        this.isJumping = false;
-        this.isMovingLeft = false;
-        this.isMovingRight = false;
-        this.lastMove = 'right';
-        this.bulletArr = [];
-        this.clearWait = 10;
-        this.clearWaitCount = 0;
     }
+
+    get xVel() { return this._xVel; }
+    get yVel() { return this._yVel; }
+    get isDeath() { return this._isDeath; }
+    get isJumping() { return this._isJumping; }
+    get isMovingLeft() { return this._isMovingLeft; }
+    get isMovingRight() { return this._isMovingRight; }
+    get bulletArr() { return this._bulletArr; }
+    get clearWaitCount() { return this._clearWaitCount; }
 
     kill(): this {
 
         // Ends horizontal moving completly
         this.stopMove();
-        this.xVel = 0;
+        this._xVel = 0;
 
         // Ends vertical moving completly
-        this.isJumping = false;
-        this.yVel = 0;
+        this._isJumping = false;
+        this._yVel = 0;
 
-        this.isDeath = true;
+        this._isDeath = true;
 
         return this;
     }
 
     move(action: xDirections): this {
 
-        if (!this.isDeath) {
-            this.isMovingLeft = action === 'left';
-            this.isMovingRight = action === 'right';
+        if (!this._isDeath) {
+            this._isMovingLeft = action === 'left';
+            this._isMovingRight = action === 'right';
             this.lastMove = action;
         }
 
@@ -71,8 +66,8 @@ export class Character extends Rect {
     stopMove(action?: xDirections, sharp = false): this {
 
         // End horizontal moving smoothly
-        this.isMovingRight = !action || action === 'right' ? false : this.isMovingRight;
-        this.isMovingLeft = !action || action === 'left' ? false : this.isMovingLeft;
+        this._isMovingRight = !action || action === 'right' ? false : this._isMovingRight;
+        this._isMovingLeft = !action || action === 'left' ? false : this._isMovingLeft;
 
         return this;
     }
@@ -80,9 +75,9 @@ export class Character extends Rect {
     jump(): this {
 
         // Abort if already jumping or not grounded (falling down from a cliff)
-        if (!this.isJumping && this.yVel === 0) {
-            this.isJumping = true;
-            this.yVel -= this.ySpeed;
+        if (!this._isJumping && this._yVel === 0) {
+            this._isJumping = true;
+            this._yVel -= this.ySpeed;
         }
 
         return this;
@@ -97,46 +92,46 @@ export class Character extends Rect {
         bullet.y = (y + height / 2) - (bullet.height / 2);
 
         bullet.move(this.lastMove);
-        this.bulletArr.push(bullet);
+        this._bulletArr.push(bullet);
     }
 
     update(): this {
 
-        if (!this.isDeath) {
+        if (!this._isDeath) {
 
             // Move right
-            if (this.isMovingRight) {
-                if (this.xVel < this.xSpeed) {
-                    this.xVel++;
+            if (this._isMovingRight) {
+                if (this._xVel < this.xSpeed) {
+                    this._xVel++;
                 }
             }
             // Move left
-            else if (this.isMovingLeft) {
-                if (this.xVel > -this.xSpeed) {
-                    this.xVel--;
+            else if (this._isMovingLeft) {
+                if (this._xVel > -this.xSpeed) {
+                    this._xVel--;
                 }
             }
             // Slow down and stop it
-            else if (this.xVel !== 0) {
-                if (Math.abs(this.xVel) < 0.05) {
-                    this.xVel = 0;
+            else if (this._xVel !== 0) {
+                if (Math.abs(this._xVel) < 0.05) {
+                    this._xVel = 0;
                 }
                 else {
-                    this.xVel *= this.friction;
+                    this._xVel *= this.friction;
                 }
             }
 
             // Gravity must always push down
-            this.yVel += GRAVITY;
+            this._yVel += GRAVITY;
 
             // Make speed || friction affect x
-            this.x += this.xVel;
+            this.x += this._xVel;
 
             // Make gravity affect y
-            this.y += this.yVel;
+            this.y += this._yVel;
 
             // Update bullets
-            this.bulletArr.forEach(bullet => {
+            this._bulletArr.forEach(bullet => {
                 bullet.update();
             });
         }
@@ -146,7 +141,7 @@ export class Character extends Rect {
 
     collisionHandler(side: xyDirections, depth: number): this {
 
-        if (!this.isDeath) {
+        if (!this._isDeath) {
             switch (side) {
                 case 'left':
                     this.x += depth;
@@ -157,7 +152,7 @@ export class Character extends Rect {
                 case 'top':
                     this.y += depth;
                     // Update vertical movement
-                    this.yVel = 0;
+                    this._yVel = 0;
                     break;
                 case 'bottom':
                     this.y -= depth;
@@ -166,15 +161,15 @@ export class Character extends Rect {
 
             // Stop character horizontal movement
             if (side === 'left' || side === 'right') {
-                this.xVel = 0;
+                this._xVel = 0;
             }
 
             // Stop vertical movement if character is moving down
-            if (side === 'bottom' && this.yVel > 0) {
-                this.yVel = 0;
+            if (side === 'bottom' && this._yVel > 0) {
+                this._yVel = 0;
 
-                if (this.isJumping) {
-                    this.isJumping = false;
+                if (this._isJumping) {
+                    this._isJumping = false;
                 }
             }
         }
@@ -184,17 +179,17 @@ export class Character extends Rect {
 
     render(): this {
 
-        let { context, bulletArr } = this;
+        let { context, _bulletArr } = this;
 
-        if (this.isDeath) {
-            if (this.clearWaitCount === this.clearWait) {
+        if (this._isDeath) {
+            if (this._clearWaitCount === this.clearWait) {
                 // Avoid rendering
                 return this;
             }
-            this.clearWaitCount++;
+            this._clearWaitCount++;
         }
 
-        bulletArr.forEach(bullet => {
+        _bulletArr.forEach(bullet => {
             bullet.render();
         });
 

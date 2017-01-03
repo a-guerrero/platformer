@@ -1,7 +1,7 @@
 import { Rect } from '../../utils/canvas/Rect';
 
 export interface Collision {
-    side: 'top' | 'right' | 'bottom' | 'left';
+    side: xyDirections;
     depth: number;
 }
 
