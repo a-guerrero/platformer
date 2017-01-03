@@ -29,17 +29,19 @@ export class Platformer {
         canvas.elem.height = canvas.height;
 
         this.stage = new Stage(canvas.ctx);
-        this.stage.width = canvas.width * 2;
-        this.stage.height = canvas.height;
+        this.stage.outerWidth = canvas.width;
+        this.stage.outerHeight = canvas.height;
+        this.stage.innerWidth = canvas.width * 3;
+        this.stage.innerHeight = canvas.height;
         this.stage.xTranslateStart = canvas.width / 2;
-        this.stage.xTranslateEnd = this.stage.width - (canvas.width / 2);
+        this.stage.xTranslateEnd = this.stage.innerWidth - (canvas.width / 2);
 
         this.protagonist = new Character(canvas.ctx);
-        this.protagonist.y = this.stage.height - this.protagonist.height;
+        this.protagonist.y = this.stage.innerHeight - this.protagonist.height;
         this.protagonist.fillStyle = 'indianred';
 
         this.antagonist = new Antagonist(canvas.ctx);
-        this.antagonist.y = this.stage.height - this.antagonist.height;
+        this.antagonist.y = this.stage.innerHeight - this.antagonist.height;
         this.antagonist.x = 80;
         this.antagonist.canJump = true;
         this.antagonist.canShoot = true;
@@ -61,14 +63,14 @@ export class Platformer {
         let { stage, canvas } = this;
         let obstaclesData = [
             // Ground
-            { x: 0, y: stage.height - 10, width: stage.width, height: 20 },
+            { x: 0, y: stage.innerHeight - 10, width: stage.innerWidth, height: 20 },
             // Left wall
-            { x: -10, y: 0, width: 20, height: stage.height },
+            { x: -10, y: 0, width: 20, height: stage.innerHeight },
             // Right wall
-            { x: stage.width - 10, y: 0, width: 20, height: stage.height },
+            { x: stage.innerWidth - 10, y: 0, width: 20, height: stage.innerHeight },
             // Bards
-            { x: 40, y: stage.height - 70, width: 40, height: 60 },
-            { x: 280, y: stage.height - 70, width: 40, height: 60 }
+            { x: 40, y: stage.innerHeight - 70, width: 40, height: 60 },
+            { x: 280, y: stage.innerHeight - 70, width: 40, height: 60 }
         ];
 
         this.obstacleArr = [];
@@ -149,7 +151,7 @@ export class Platformer {
 
         let { canvas, stage, protagonist, antagonist, obstacleArr } = this;
 
-        canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.ctx.clearRect(-stage.x, stage.y, stage.outerWidth, stage.outerHeight);
 
         protagonist.update();
         antagonist.update();
@@ -204,6 +206,9 @@ export class Platformer {
         antagonist.render();
         protagonist.render();
 
+        stage.x = protagonist.x;
+        stage.render();
+
         requestAnimationFrame(this.update.bind(this));
 
         return this;
@@ -215,7 +220,7 @@ export class Platformer {
         let { canvas, stage } = this;
 
         // Check if is out of sight
-        if (bullet.remove || (bullet.x < 0 || bullet.x > stage.x + canvas.width)) {
+        if (bullet.remove || (bullet.x < -stage.x || bullet.x > -stage.x + stage.outerWidth)) {
             // Remove from array
             bulletArr.splice(index, 1);
         }
@@ -223,7 +228,7 @@ export class Platformer {
         return this;
     }
 
-    /** Checks if bullet has collided with a Character */
+    /** Checks if a bullet has collided with a Character */
     private checkForShotCharacter(bullet: Bullet, characterArr: Character[]): this {
 
         characterArr.forEach(character => {
