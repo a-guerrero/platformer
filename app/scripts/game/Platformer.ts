@@ -1,6 +1,7 @@
 import { Rect } from '../utils/canvas/Rect';
 import { checkForCollision } from './utils/checkForCollision';
 import { getObstacleArr } from './utils/getObstacleArr';
+import { getAntagonistArr } from './utils/getAntagonistArr';
 import { Stage } from './Stage';
 import { Character } from './Character';
 import { Antagonist } from './Antagonist';
@@ -51,13 +52,11 @@ export class Platformer {
         this._endLoopCount = 0;
 
         this.obstacleArr = getObstacleArr(canvas.ctx, this.stage.innerWidth, this.stage.innerHeight);
-        this.antagonistArr = [];
+        this.antagonistArr = getAntagonistArr(canvas.ctx, this.stage.innerWidth, this.stage.innerHeight);
 
         this
             .bind()
             .update();
-
-        // setInterval(() => { this.update(); }, 250);
     }
 
     private bind(): this {
@@ -119,12 +118,15 @@ export class Platformer {
         }
     }
 
+    /** Draws protagonist, antagonists and obstacles */
     private update(): this {
 
         let { canvas, stage, protagonist, antagonistArr, obstacleArr } = this;
 
+        // Clear stage visible area
         canvas.ctx.clearRect(-stage.x, stage.y, stage.outerWidth, stage.outerHeight);
 
+        // Update protagonist and its bullets
         protagonist.update();
         protagonist.bulletArr.forEach(bullet => { bullet.update() });
         protagonist.bulletArr.forEach((bullet, i) => {
@@ -135,6 +137,7 @@ export class Platformer {
                 .checkForBulletCollision(bullet, obstacleArr);
         });
 
+        // Update antagonist and its bullets
         antagonistArr.forEach(antagonist => {
             antagonist.update();
             antagonist.bulletArr.forEach(bullet => { bullet.update() });
@@ -146,6 +149,8 @@ export class Platformer {
             });
         });
 
+        // Check if characters has collide with obstacles or if character had
+        // collide with each other
         obstacleArr.forEach(obstacle => {
 
             // Invisible obstacles don't affect protagonist
@@ -183,19 +188,23 @@ export class Platformer {
             obstacle.render();
         });
 
+        // Render antagonist and its bullets
         antagonistArr.forEach(antagonist => {
             antagonist.bulletArr.forEach(bullet => { bullet.render(); });
             antagonist.render();
         });
 
+        // Render protagonist and its bullets
         protagonist.bulletArr.forEach(bullet => { bullet.render(); });
         protagonist.render();
 
+        // Move stage along with protagonist
         stage.x = protagonist.x;
         stage.render();
 
+        // End game validation
         if (this._endLoop) {
-            if (this._endLoopCount === this.protagonist.clearWait - 2) {
+            if (this._endLoopCount === protagonist.clearWait - 2) {
                 // Reload website
                 location.reload();
                 // Avoid rendering
@@ -204,7 +213,12 @@ export class Platformer {
             this._endLoopCount++;
         }
 
-        this._endLoop = this.protagonist.isDeath;
+        // Restart game if protagonist is death or very close to the end
+        if (protagonist.isDeath || this.protagonist.x > (stage.innerWidth - protagonist.width - 10)) {
+            this._endLoop = true;
+        }
+
+        // Keep updating if everything is ok
         requestAnimationFrame(this.update.bind(this));
 
         return this;
@@ -245,6 +259,9 @@ export class Platformer {
         targetArr.forEach(target => {
 
             let collision = checkForCollision(bullet, target, true);
+
+            // Invisible obstacles don't affect bullets
+            if (target['isInvisible']) return;
 
             if (typeof collision === 'object') {
                 bullet.collisionHandler(collision.side, collision.depth);

@@ -136,9 +136,9 @@ export function getObstacleArr(ctx: CanvasRenderingContext2D, width, height): Ob
     p4Floor.y = height - p4Floor.height;
     obstacleArr.push(p4Floor);
 
-    let p4FloorRightLimit = getInvisibleBlock(ctx);
+    let p4FloorRightLimit = getInvisibleBlock(ctx, 1, 3);
     p4FloorRightLimit.x = p4Floor.x + p4Floor.width;
-    p4FloorRightLimit.y = height - (p4FloorRightLimit.height * 2);
+    p4FloorRightLimit.y = height - (p4FloorRightLimit.height);
     obstacleArr.push(p4FloorRightLimit);
 
     let p4Lava = getLava(ctx, 9);

@@ -18,7 +18,7 @@ export class Antagonist extends Character {
         // Super defaults override
         this.ySpeed = 6;
         this.xSpeed = 0.25;
-        this.fillStyle = 'red';
+        this.fillStyle = '#524f56';
         this.spriteFrames = {
             defaultRight: [28, 0],
             defaultLeft: [28, 16],

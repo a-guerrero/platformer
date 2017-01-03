@@ -15,7 +15,7 @@ export class Obstacle extends Rect {
 
         let { context, isInvisible } = this;
 
-        context.fillStyle = isInvisible ? '#ededed' : this.fillStyle;
+        context.fillStyle = isInvisible ? 'transparent' : this.fillStyle;
         super.render();
         context.fill();
 
