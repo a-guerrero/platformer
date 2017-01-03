@@ -14,6 +14,12 @@ export class Antagonist extends Character {
         this.ySpeed = 7;
         this.xSpeed = 0.25;
         this.fillStyle = 'red';
+        this.spriteFrames = {
+            defaultRight: [28, 0],
+            defaultLeft: [28, 16],
+            deathRight: [42, 0],
+            deathLeft: [42, 16]
+        };
 
         // Defaults
         this.canJump = false;
@@ -44,10 +50,9 @@ export class Antagonist extends Character {
         super.collisionHandler(side, depth);
 
         // Keep moving after side collision
-        if (!this._isDeath && (side === 'right' || side === 'left')) {
-
-            this._isMovingLeft = side === 'right';
-            this._isMovingRight = side === 'left';
+        if (!this._isDeath) {
+            if (side === 'right') this.move('left');
+            if (side === 'left') this.move('right');
         }
 
         return this;

@@ -1,4 +1,6 @@
+import { IS_HIDPI } from '../utils/constants';
 import { Rect } from '../utils/canvas/Rect';
+import { Sprite } from '../utils/canvas/Sprite';
 import { GRAVITY } from './utils/constants';
 import { Bullet } from './Bullet';
 
@@ -10,6 +12,13 @@ export class Character extends Rect {
     clearWait = 10;
     lastMove: xDirections = 'right';
     fillStyle: CanvasFillStyle = 'black';
+    sprite: Sprite;
+    spriteFrames = {
+        defaultRight: [0, 0],
+        defaultLeft: [0, 16],
+        deathRight: [14, 0],
+        deathLeft: [14, 16]
+    };
 
     protected _xVel = 0;
     protected _yVel = 0;
@@ -26,6 +35,12 @@ export class Character extends Rect {
 
         this.width = 20;
         this.height = 30;
+
+        let spriteId = IS_HIDPI ? 'js-sprite-2x' : 'js-sprite-1x';
+        this.sprite = new Sprite(context);
+        this.sprite.img = <HTMLImageElement>document.getElementById(spriteId);
+        this.sprite.width = 14;
+        this.sprite.height = 16;
     }
 
     get xVel() { return this._xVel; }
@@ -196,6 +211,45 @@ export class Character extends Rect {
         context.fillStyle = this.fillStyle;
         super.render();
         context.fill();
+
+        this.renderFace();
+
+        return this;
+    }
+
+    renderFace(): this {
+
+        let { context, sprite, lastMove, spriteFrames } = this;
+
+        sprite.yPosition = this.y;
+        sprite.xPosition = this.x;
+
+        if (lastMove === 'right') {
+            sprite.xPosition += this.width - sprite.width;
+        }
+
+        if (this.isDeath) {
+            if (lastMove === 'right') {
+                sprite.xOrigin = spriteFrames.deathRight[0];
+                sprite.yOrigin = spriteFrames.deathRight[1];
+            }
+            else {
+                sprite.xOrigin = spriteFrames.deathLeft[0];
+                sprite.yOrigin = spriteFrames.deathLeft[1];
+            }
+        }
+        else {
+            if (lastMove === 'right') {
+                sprite.xOrigin = spriteFrames.defaultRight[0];
+                sprite.yOrigin = spriteFrames.defaultRight[1];
+            }
+            else {
+                sprite.xOrigin = spriteFrames.defaultLeft[0];
+                sprite.yOrigin = spriteFrames.defaultLeft[1];
+            }
+        }
+
+        sprite.render();
 
         return this;
     }
