@@ -1,5 +1,6 @@
-import { GRAVITY } from './utils/constants';
 import { Rect } from '../utils/canvas/Rect';
+import { GRAVITY } from './utils/constants';
+import { Bullet } from './Bullet';
 
 export class Character extends Rect {
 
@@ -11,9 +12,10 @@ export class Character extends Rect {
     fillStyle: string | CanvasGradient | CanvasPattern;
     isDeath: boolean;
     isJumping: boolean;
-    isGrounded: boolean;
     isMovingLeft: boolean;
     isMovingRight: boolean;
+    lastMove: xDirections;
+    bulletArr: Bullet[];
 
     clearWait: number;
     private clearWaitCount: number;
@@ -34,6 +36,8 @@ export class Character extends Rect {
         this.isJumping = false;
         this.isMovingLeft = false;
         this.isMovingRight = false;
+        this.lastMove = 'right';
+        this.bulletArr = [];
         this.clearWait = 10;
         this.clearWaitCount = 0;
     }
@@ -53,17 +57,18 @@ export class Character extends Rect {
         return this;
     }
 
-    move(action: 'right' | 'left'): this {
+    move(action: xDirections): this {
 
         if (!this.isDeath) {
             this.isMovingLeft = action === 'left';
             this.isMovingRight = action === 'right';
+            this.lastMove = action;
         }
 
         return this;
     }
 
-    stopMove(action?: 'right' | 'left', sharp = false): this {
+    stopMove(action?: xDirections, sharp = false): this {
 
         // End horizontal moving smoothly
         this.isMovingRight = !action || action === 'right' ? false : this.isMovingRight;
@@ -81,6 +86,18 @@ export class Character extends Rect {
         }
 
         return this;
+    }
+
+    shoot() {
+
+        let { context, x, y, width, height } = this;
+
+        let bullet = new Bullet(context);
+        bullet.x = (x + width / 2) - (bullet.width / 2);
+        bullet.y = (y + height / 2) - (bullet.height / 2);
+
+        bullet.move(this.lastMove);
+        this.bulletArr.push(bullet);
     }
 
     update(): this {
@@ -117,12 +134,17 @@ export class Character extends Rect {
 
             // Make gravity affect y
             this.y += this.yVel;
+
+            // Update bullets
+            this.bulletArr.forEach(bullet => {
+                bullet.update();
+            });
         }
 
         return this;
     }
 
-    collisionHandler(side: 'top' | 'right' | 'bottom' | 'left', depth: number): this {
+    collisionHandler(side: xyDirections, depth: number): this {
 
         if (!this.isDeath) {
             switch (side) {
@@ -162,7 +184,7 @@ export class Character extends Rect {
 
     render(): this {
 
-        let { context } = this;
+        let { context, bulletArr } = this;
 
         if (this.isDeath) {
             if (this.clearWaitCount === this.clearWait) {
@@ -171,6 +193,10 @@ export class Character extends Rect {
             }
             this.clearWaitCount++;
         }
+
+        bulletArr.forEach(bullet => {
+            bullet.render();
+        });
 
         context.fillStyle = this.fillStyle;
         super.render();
