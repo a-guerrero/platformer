@@ -34,7 +34,7 @@
     "build-prod:pug": "pug app/*.pug -o dist",
     "watch:pug": "onchange \"app/**/*.pug\" -- npm run build:pug",
     "build:sass": "node-sass \"app/styles\" --include-path \"./node_modules/bourbon/app/assets/stylesheets\" --source-map \"dist/styles/maps\" -o \"dist/styles\"",
-    "build-prod:sass": "node-sass \"app/styles\" --include-path \"./node_modules/bourbon/app/assets/stylesheets\" --output-style compressed -o \"dist/styles\"",
+    "build-prod:sass": "node-sass \"app/styles\" --include-path \"./node_modules/bourbon/app/assets/stylesheets\" --source-map \"dist/styles/maps\" --output-style compressed -o \"dist/styles\"",
     "watch:sass": "onchange \"app/styles/*.{sass,scss}\" -- npm run build:sass",
     "build:webpack": "webpack",
     "build-prod:webpack": "cross-env NODE_ENV=production webpack",
