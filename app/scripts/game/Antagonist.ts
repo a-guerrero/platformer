@@ -3,7 +3,11 @@ import { Character } from './Character';
 export class Antagonist extends Character {
 
     canJump = false;
+    canShoot = false;
+    shootWait = 50;
     jumpWait = 10;
+
+    protected _shootWaitCount = 0;
     protected _jumpWaitCount = 0;
 
     constructor(public context: CanvasRenderingContext2D) {
@@ -11,7 +15,7 @@ export class Antagonist extends Character {
         super(context);
 
         // Super defaults override
-        this.ySpeed = 7;
+        this.ySpeed = 6;
         this.xSpeed = 0.25;
         this.fillStyle = 'red';
         this.spriteFrames = {
@@ -29,13 +33,19 @@ export class Antagonist extends Character {
 
     update(): this {
 
+        // Auto jumping
         if (this.canJump && !this._isJumping) {
-            // Wait some frames before jumping
             if (this._jumpWaitCount++ === this.jumpWait) {
-                // Jump
                 this.jump();
-                // Reset jump frame count
                 this._jumpWaitCount = 0;
+            }
+        }
+
+        // Auto shooting
+        if (this.canShoot) {
+            if (this._shootWaitCount++ === this.shootWait) {
+                this.shoot();
+                this._shootWaitCount = 0;
             }
         }
 
