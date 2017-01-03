@@ -19,6 +19,7 @@ export class Platformer {
     private obstacleArr: Obstacle[];
 
     private isJumpKeyPressed: boolean;
+    private isShootKeyPressed: boolean;
 
     constructor(public canvas: Canvas) {
 
@@ -41,6 +42,7 @@ export class Platformer {
         this.antagonist.isMovingRight = true;
 
         this.isJumpKeyPressed = false;
+        this.isShootKeyPressed = false;
 
         this
             .bind()
@@ -111,6 +113,13 @@ export class Platformer {
                 this.isJumpKeyPressed = true;
             }
         }
+        if (keyCode === 90) {
+            // Prevent continuous shooting
+            if (!this.isShootKeyPressed) {
+                protagonist.shoot();
+                this.isShootKeyPressed = true;
+            }
+        }
     }
 
     private onkeyup(e: KeyboardEvent) {
@@ -126,6 +135,9 @@ export class Platformer {
         }
         if (keyCode === 38 || keyCode === 32) {
             this.isJumpKeyPressed = false;
+        }
+        if (keyCode === 90) {
+            this.isShootKeyPressed = false;
         }
     }
 
