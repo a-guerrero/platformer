@@ -3,7 +3,8 @@ import { Rect } from '../utils/canvas/Rect';
 export class Obstacle extends Rect {
 
     canKill = false;
-    fillStyle: CanvasFillStyle  = 'black';
+    isInvisible = false;
+    fillStyle: CanvasFillStyle = 'black';
 
     constructor(public context: CanvasRenderingContext2D) {
         super(context);
@@ -12,9 +13,9 @@ export class Obstacle extends Rect {
 
     render(): this {
 
-        let { context } = this;
+        let { context, isInvisible } = this;
 
-        context.fillStyle = this.fillStyle;
+        context.fillStyle = isInvisible ? '#ededed' : this.fillStyle;
         super.render();
         context.fill();
 

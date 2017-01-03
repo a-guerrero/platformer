@@ -11,7 +11,7 @@ export class Character extends Rect {
     ySpeed = 8;
     clearWait = 25;
     lastMove: xDirections = 'right';
-    fillStyle: CanvasFillStyle = 'black';
+    fillStyle: CanvasFillStyle = '#5575ff';
     sprite: Sprite;
     spriteFrames = {
         defaultRight: [0, 0],
@@ -33,8 +33,8 @@ export class Character extends Rect {
 
         super(context);
 
-        this.width = 20;
-        this.height = 30;
+        this.width = 24;
+        this.height = 32;
 
         let spriteId = IS_HIDPI ? 'js-sprite-2x' : 'js-sprite-1x';
         this.sprite = new Sprite(context);
@@ -103,6 +103,7 @@ export class Character extends Rect {
         let { context, x, y, width, height } = this;
 
         let bullet = new Bullet(context);
+        bullet.fillStyle = this.fillStyle;
         bullet.x = (x + width / 2) - (bullet.width / 2);
         bullet.y = (y + height / 2) - (bullet.height / 2);
 

@@ -3,7 +3,7 @@
 html,
 body {
     font-size: $em-base;
-    background: #4c4158;
+    background: #fbfafa;
 
     @include size(100%);
 }
@@ -28,5 +28,4 @@ section {
 #js-stage {
     margin: 2em auto;
     @include size(512px 288px);
-    background: rgba(black, 0.15);
 }

@@ -1,5 +1,6 @@
 import { Rect } from '../utils/canvas/Rect';
 import { checkForCollision } from './utils/checkForCollision';
+import { getObstacleArr } from './utils/getObstacleArr';
 import { Stage } from './Stage';
 import { Character } from './Character';
 import { Antagonist } from './Antagonist';
@@ -34,14 +35,14 @@ export class Platformer {
         this.stage = new Stage(canvas.ctx);
         this.stage.outerWidth = canvas.width;
         this.stage.outerHeight = canvas.height;
-        this.stage.innerWidth = canvas.width * 3;
+        this.stage.innerWidth = canvas.width * 4;
         this.stage.innerHeight = canvas.height;
         this.stage.xTranslateStart = canvas.width / 2;
         this.stage.xTranslateEnd = this.stage.innerWidth - (canvas.width / 2);
 
         this.protagonist = new Character(canvas.ctx);
+        this.protagonist.x = 16;
         this.protagonist.y = (this.stage.innerHeight / 2) - this.protagonist.height;
-        this.protagonist.fillStyle = 'indianred';
 
         this.isJumpKeyPressed = false;
         this.isShootKeyPressed = false;
@@ -49,77 +50,14 @@ export class Platformer {
         this._endLoop = false;
         this._endLoopCount = 0;
 
+        this.obstacleArr = getObstacleArr(canvas.ctx, this.stage.innerWidth, this.stage.innerHeight);
+        this.antagonistArr = [];
+
         this
             .bind()
-            .setObstacleArr()
-            .setAntagonistArray()
             .update();
 
         // setInterval(() => { this.update(); }, 250);
-    }
-
-    private setObstacleArr(): this {
-
-        let { stage, canvas } = this;
-        let obstaclesData = <Obstacle[]>[
-            // Ground
-            { x: 0, y: stage.innerHeight - 10, width: stage.innerWidth, height: 20 },
-            // Left wall (hidden)
-            { x: -20, y: 0, width: 20, height: stage.innerHeight },
-            // Right wall (hidden)
-            { x: stage.innerWidth + 20, y: 0, width: 20, height: stage.innerHeight },
-            // Bards
-            { x: 40, y: stage.innerHeight - 70, width: 40, height: 60 },
-            { x: 280, y: stage.innerHeight - 70, width: 40, height: 60 },
-            // Lava
-            { x: 320, y: stage.innerHeight - 30, width: 100, height: 20, fillStyle: 'red', canKill: true }
-        ];
-
-        this.obstacleArr = [];
-        obstaclesData.forEach(obj => {
-
-            let obstacle = new Obstacle(canvas.ctx);
-            obstacle.x = obj.x;
-            obstacle.y = obj.y;
-            obstacle.width = obj.width;
-            obstacle.height = obj.height;
-
-            if (obj.fillStyle) obstacle.fillStyle = obj.fillStyle;
-            if (obj.canKill) obstacle.canKill = obj.canKill;
-
-            this.obstacleArr.push(obstacle);
-        });
-
-        return this;
-    }
-
-    private setAntagonistArray(): this {
-
-        let { stage, canvas } = this;
-
-        const antagonistData = <Antagonist[]>[
-            { y: this.stage.innerHeight - 30, x: 80, canJump: true, canShoot: true, canMove: true },
-            { y: this.stage.innerHeight - 30, x: 120, canMove: true, lastMove: 'left', fillStyle: 'gray' }
-        ];
-
-        this.antagonistArr = [];
-        antagonistData.forEach(obj => {
-
-            let antagonist = new Antagonist(canvas.ctx);
-
-            antagonist.x = obj.x;
-            antagonist.y = obj.y;
-
-            if (obj.lastMove) antagonist.lastMove = obj.lastMove;
-            if (obj.canMove) antagonist.canMove = obj.canMove;
-            if (obj.canJump) antagonist.canJump = obj.canJump;
-            if (obj.canShoot) antagonist.canShoot = obj.canShoot;
-            if (obj.fillStyle) antagonist.fillStyle = obj.fillStyle;
-
-            this.antagonistArr.push(antagonist);
-        });
-
-        return this;
     }
 
     private bind(): this {
@@ -210,14 +148,17 @@ export class Platformer {
 
         obstacleArr.forEach(obstacle => {
 
-            let protagonistCollision = checkForCollision(protagonist, obstacle, true);
-            if (typeof protagonistCollision === 'object') {
-                protagonist.collisionHandler(
-                    protagonistCollision.side,
-                    protagonistCollision.depth);
+            // Invisible obstacles don't affect protagonist
+            if (!obstacle.isInvisible) {
+                let protagonistCollision = checkForCollision(protagonist, obstacle, true);
+                if (typeof protagonistCollision === 'object') {
+                    protagonist.collisionHandler(
+                        protagonistCollision.side,
+                        protagonistCollision.depth);
 
-                if (obstacle.canKill) {
-                    protagonist.kill();
+                    if (obstacle.canKill) {
+                        protagonist.kill();
+                    }
                 }
             }
 
