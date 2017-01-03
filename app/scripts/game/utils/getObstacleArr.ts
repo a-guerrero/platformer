@@ -59,6 +59,11 @@ export function getObstacleArr(ctx: CanvasRenderingContext2D, width, height): Ob
     p1FloorRightLimit.y = p1Floor.y - p1FloorRightLimit.height;
     obstacleArr.push(p1FloorRightLimit);
 
+    let p1ProtagonistGuard = getInvisibleBlock(ctx, 1, 1);
+    p1ProtagonistGuard.x = p1ProtagonistGuard.width;
+    p1ProtagonistGuard.y = p1FloorRightLimit.y;
+    obstacleArr.push(p1ProtagonistGuard);
+
     let p1Lava = getLava(ctx, 11, 1);
     p1Lava.x = p1Floor.x + p1Floor.width;
     p1Lava.y = height - p1Lava.height;
