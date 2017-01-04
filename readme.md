@@ -6,13 +6,13 @@ Canvas platformer game excercise.
 How to start?
 ---
 
-**Firts install the needed npm dependencies:**
+**First install the needed npm dependencies:**
 
     npm install
 
 **To build run the npm-script:**
 
-    npm run build-prod
+    npm run build
 
 **To build for production:**
 
