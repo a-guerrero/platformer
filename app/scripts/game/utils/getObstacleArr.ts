@@ -29,7 +29,6 @@ function getLava(ctx: CanvasRenderingContext2D, width = 1, height = 1): Obstacle
 export function getObstacleArr(ctx: CanvasRenderingContext2D, width, height): Obstacle[] {
 
     let obstacleArr: Obstacle[] = [];
-    let lavaFillStyle = '#ff4a4a';
 
     // LIMITS
     ////////////////////////////////////////////////////////////////////////////

@@ -227,7 +227,7 @@ export class Platformer {
     /** Cleans bullets that are out of sight */
     private cleanBulletArr(bulletArr: Bullet[], index: number, bullet: Bullet): this {
 
-        let { canvas, stage } = this;
+        let { stage } = this;
 
         // Check if is out of sight
         if (bullet.remove || (bullet.x < -stage.x || bullet.x > -stage.x + stage.outerWidth)) {

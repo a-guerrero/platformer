@@ -192,7 +192,7 @@ export class Character extends Rect {
 
     render(): this {
 
-        let { context, _bulletArr } = this;
+        let { context } = this;
 
         if (this._isDeath) {
             if (this._clearWaitCount === this.clearWait) {
@@ -213,7 +213,7 @@ export class Character extends Rect {
 
     renderFace(): this {
 
-        let { context, sprite, lastMove, spriteFrames } = this;
+        let { sprite, lastMove, spriteFrames } = this;
 
         sprite.yPosition = this.y;
         sprite.xPosition = this.x;
